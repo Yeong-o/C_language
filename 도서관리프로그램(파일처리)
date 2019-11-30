@@ -1,0 +1,812 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<malloc.h>
+
+typedef struct client{
+	char name[10];
+	char number[10];
+	char phone[15];
+	char email[20];
+	struct client* next1;
+}client;
+
+typedef struct BOOK{
+	char chName[20];
+	char chAuthor[10];
+	char chNumber[8];
+	char chPublisher[10];
+	char chDay[10];
+	struct tagBOOk* next;
+}book;
+
+typedef struct list{
+	char number1[10];
+	char number2[8];
+	char rent[15];
+	char turn[15];
+	struct list* next2;
+}list;
+
+void menu(){
+	printf("1.고객 관리");
+	printf("2.도서 관리");
+	printf("3.도서대여 관리");
+	printf("4.파일에 저장");
+	printf("5.불러오기");
+	printf("0.프로그램 종료\n");
+	printf("명령을 선택하세요>___");
+}
+
+void menu1(){
+	printf("고객관리\n");
+	printf("1.신규 고객 입력\n");
+	printf("2.고객정보수정\n");
+	printf("3.고객정보삭제\n");
+	printf("4.고객정보보기(이름앞2자이상입력)\n");
+	printf("5.고객정보보기(핸드폰뒷4자기입력)\n");
+	printf("6.전체고객정보보기(이름순)\n");
+	printf("0.이전 복귀\n");
+	printf("명령을 선택하세요>___");
+}
+
+void insertclient(client* head){
+	client* p = head;
+	client* newnode = (client*)malloc(sizeof(client));
+	newnode->next1 = NULL;
+	printf("고객번호 : ");
+	scanf("%s", newnode->number);
+	printf("고객명 : ");
+	scanf("%s", newnode->name);
+	printf("전화번호 : ");
+	scanf("%s", newnode->phone);
+	printf("이메일 : ");
+	scanf("%s", newnode->email);
+	if (head == NULL){
+		head->next1 = p;
+	}
+	else{
+		while (p->next1 != NULL){
+			p = p->next1;
+		}
+		p->next1 = newnode;
+	}
+}
+
+void saveclient(client* head){
+	FILE* fp = fopen("a.txt", "a");
+	client* s;
+	char buf[100] = { NULL };
+	if (fp == NULL){
+		printf("오류\n");
+	}
+	s = head->next1;
+	while (s != NULL){
+		fprintf(fp, "%s,%s,%s,%s*", s->number, s->name, s->phone, s->email);
+		s = s->next1;
+	}
+	fclose(fp);
+}
+
+void modifyclient(client* head){
+	char data[20];
+	client* p = head;
+	printf("수정할 고객명 : ");
+	scanf("%s", data);
+	for (p = head; p != NULL; p = p->next1){
+		if (strcmp(p->name, data) == 0){
+			printf("고객번호 : ");
+			scanf("%s", p->number);
+			printf("고객명 : ");
+			scanf("%s", p->name);
+			printf("전화번호 : ");
+			scanf("%s", p->phone);
+			printf("이메일 : ");
+			scanf("%s", p->email);
+		}
+	}
+}
+
+void deleteclient(client* head){
+	char data[20];
+	client* p = head;
+	client* s = p->next1;
+	printf("삭제할 고객명 : ");
+	scanf("%s", data);
+	while (p != NULL){
+		if (strcmp(s->name, data) != 0){
+			p = p->next1;
+			s = s->next1;
+		}
+		else{
+			p->next1 = s->next1;
+			free(s);
+		}
+	}
+}
+
+void searchnameclient(client* head){
+	char data[20];
+	int count = 0;
+	client* p;
+	printf("고객명 : ");
+	scanf("%s", data);
+	for (p = head; p != NULL; p = p->next1){
+		if (strncmp(p->name, data, 4) == 0){
+			printf("고객번호 : %s\n", p->number);
+			printf("고객명 : %s\n", p->name);
+			printf("전화번호 : %s\n", p->phone);
+			printf("이메일 : %s\n", p->email);
+			count++;
+		}
+	}
+	if (count == 0){
+		printf("일치하는 고객이 없습니다.\n");
+	}
+}
+
+void searchphoneclient(client* head){
+	char data[5];
+	int count = 0;
+	char* a = NULL;
+	client* p;
+	printf("핸드폰 뒷자리 입력 : ");
+	scanf("%s", data);
+	for (p = head; p != NULL; p = p->next1){
+		if (a = strstr(p->phone, data)){
+			printf("고객번호 : %s\n", p->number);
+			printf("고객명 : %s\n", p->name);
+			printf("전화번호 : %s\n", p->phone);
+			printf("이메일 : %s\n", p->email);
+			count++;
+		}
+	}
+	if (count == 0)printf("일치하는 고객이 없습니다.\n");
+}
+
+void sortclient(client* head){
+	client* p = head;
+	client* temp = head;
+	client* s;
+	while (p->next1 != NULL){
+		s = p;
+		p = p->next1;
+		if (p->next1 != NULL){
+			temp = p->next1;
+			if (strcmp(p->name, temp->name) > 0){
+				s->next1 = temp;
+				p->next1 = temp->next1;
+				temp->next1 = p;
+				p = head;
+			}
+		}
+	}
+}
+
+void printclient(client* head){
+	client* p = head;
+	while (p->next1 != NULL){
+		p = p->next1;
+		printf("고객번호 : %s\n", p->number);
+		printf("고객명 : %s\n", p->name);
+		printf("전화번호 : %s\n", p->phone);
+		printf("이메일 : %s\n", p->email);
+	}
+}
+
+void menu2(){
+	printf("도서관리\n");
+	printf("1.신규 도서 입력\n");
+	printf("2.도서정보수정\n");
+	printf("3.도서정보삭제\n");
+	printf("4.도서정보보기(이름앞2자이상입력)\n");
+	printf("5.도서정보보기(매입날짜)\n");
+	printf("6.도서정보보기(도서명순)\n");
+	printf("7.도서정보보기(저자명순)\n");
+	printf("8.도서정보보기(매입날짜순)\n");
+	printf("0.이전 복귀\n");
+	printf("명령을 선택하세요>___");
+}
+
+void insertbook(book* head){
+	book* p = head;
+	book* newnode = (book*)malloc(sizeof(book));
+	newnode->next = NULL;
+	printf("도서명 : ");
+	scanf("%s", newnode->chName);
+	printf("저자 : ");
+	scanf("%s", newnode->chAuthor);
+	printf("도서번호 : ");
+	scanf("%s", newnode->chNumber);
+	printf("출판사 : ");
+	scanf("%s", newnode->chPublisher);
+	printf("출판일 : ");
+	scanf("%s", newnode->chDay);
+	if (head == NULL){
+		head->next = p;
+	}
+	else{
+		while (p->next != NULL){
+			p = p->next;
+		}
+		p->next = newnode;
+	}
+}
+
+void savebook(book* head){
+	FILE* fp = fopen("a.txt", "a");
+	book* s;
+	if (fp == NULL){
+		printf("오류\n");
+	}
+	s = head->next;
+	while (s != NULL){
+		fprintf(fp, "%s,%s,%s,%s,%s*", s->chName, s->chAuthor,s->chNumber,s->chPublisher,s->chDay);
+		s = s->next;
+	}
+	fclose(fp);
+}
+
+void modifybook(book* head){
+	char data[20];
+	book* p = head;
+	printf("수정할 도서명 : ");
+	scanf("%s", data);
+	for (p = head; p != NULL; p = p->next){
+		if (strcmp(p->chName, data) == 0){
+			printf("도서명 : ");
+			scanf("%s", p->chName);
+			printf("저자 : ");
+			scanf("%s", p->chAuthor);
+			printf("도서번호 : ");
+			scanf("%s", p->chNumber);
+			printf("출판사 : ");
+			scanf("%s", p->chPublisher);
+			printf("출판일 : ");
+			scanf("%s", p->chDay);
+		}
+	}
+}
+
+void deletebook(book* head){
+	char data[20];
+	book* p = head;
+	book* s = p->next;
+	printf("삭제할 도서명 : ");
+	scanf("%s", data);
+	while (p != NULL){
+		if (strcmp(s->chName, data) != 0){
+			p = p->next;
+			s = s->next;
+		}
+		else{
+			p->next = s->next;
+			free(s);
+		}
+	}
+}
+
+void searchnamebook(book* head){
+	char data[20];
+	int count = 0;
+	book* p;
+	printf("도서명 : ");
+	scanf("%s", data);
+	for (p = head; p != NULL; p = p->next){
+		if (strncmp(p->chName, data, 4) == 0){
+			printf("도서번호 : %s\n", p->chNumber);
+			printf("도서명 : %s\n", p->chName);
+			printf("저자 : %s\n", p->chAuthor);
+			printf("출판사 : %s\n", p->chPublisher);
+			printf("출판일 : %s\n", p->chDay);
+			count++;
+		}
+	}
+	if (count == 0){
+		printf("일치하는 정보가 없습니다.\n");
+	}
+}
+
+void searchdaybook(book* head){
+	char data[20];
+	int count = 0;
+	book* p;
+	printf("매입날짜 : ");
+	scanf("%s", data);
+	for (p = head; p != NULL; p = p->next){
+		if (strcmp(p->chDay, data) == 0){
+			printf("도서번호 : %s\n", p->chNumber);
+			printf("도서명 : %s\n", p->chName);
+			printf("저자 : %s\n", p->chAuthor);
+			printf("출판사 : %s\n", p->chPublisher);
+			printf("출판일 : %s\n", p->chDay);
+			count++;
+		}
+	}
+	if (count == 0)printf("일치하는 정보가 없습니다.\n");
+}
+
+void sortnamebook(book* head){
+	book* p = head;
+	book* temp = head;
+	book* s;
+	while (p->next != NULL){
+		s = p;
+		p = p->next;
+		if (p->next != NULL){
+			temp = p->next;
+			if (strcmp(p->chName, temp->chName) > 0){
+				s->next = temp;
+				p->next = temp->next;
+				temp->next = p;
+				p = head;
+			}
+		}
+	}
+}
+
+void sortauthorbook(book* head){
+	book* p = head;
+	book* temp = head;
+	book* s;
+	while (p->next != NULL){
+		s = p;
+		p = p->next;
+		if (p->next != NULL){
+			temp = p->next;
+			if (strcmp(p->chAuthor, temp->chAuthor) > 0){
+				s->next = temp;
+				p->next = temp->next;
+				temp->next = p;
+				p = head;
+			}
+		}
+	}
+}
+
+void sortdaybook(book* head){
+	book* p = head;
+	book* temp = head;
+	book* s;
+	while (p->next != NULL){
+		s = p;
+		p = p->next;
+		if (p->next != NULL){
+			temp = p->next;
+			if (strcmp(p->chDay, temp->chDay) > 0){
+				s->next = temp;
+				p->next = temp->next;
+				temp->next = p;
+				p = head;
+			}
+		}
+	}
+}
+
+void printbook(book* head){
+	book* p = head;
+	while (p->next != NULL){
+		p = p->next;
+		printf("도서번호 : %s\n", p->chNumber);
+		printf("도서명 : %s\n", p->chName);
+		printf("저자 : %s\n", p->chAuthor);
+		printf("출판사 : %s\n", p->chPublisher);
+		printf("출판일 : %s\n", p->chDay);
+	}
+}
+
+void menu3(){
+	printf("도서대여관리\n");
+	printf("1.도서대여\n");
+	printf("2.도서반납(수정필요)\n");
+	printf("3.대여도서목록보기(날짜순)\n");
+	printf("4.도서별대여정보보기(도서번호입력)\n");
+	printf("5.고객별대여도서보기(대여자번호입력)\n");
+	printf("6.연체자정보보기(연체일수정렬)\n");
+	printf("0.이전 복귀\n");
+	printf("명령을 선택하세요>___");
+}
+
+void rent(client* headclient, book* headbook, list* headlist){
+	char data[10];
+	char data1[10];
+	int a;
+	book* p;
+	client* s;
+	list* k = headlist;
+	list* m = k->next2;
+	list* newnode = (list*)malloc(sizeof(list));
+	newnode->next2 = NULL;
+	printf("1.YES 2.NO\n");
+	printf("선택하시오>___");
+	scanf("%d", &a);
+	switch (a){
+	case 1:
+		printf("도서번호 : ");
+		scanf("%s", data);
+		for (p = headbook->next; p != NULL; p = p->next){
+			if (strcmp(p->chNumber, data) == 0){
+				printf("고객번호 : ");
+				scanf("%s", data1);
+				for (s = headclient->next1; s != NULL; s = s->next1){
+					if (strcmp(s->number, data1) == 0){
+						printf("대여일 : ");
+						scanf("%s", newnode->rent);
+						strcpy(newnode->turn, "미반납");
+						strcpy(newnode->number1, s->number);
+						strcpy(newnode->number2, p->chNumber);
+						while (m != NULL&&strcmp(m->rent, newnode->rent) <= 0){
+							k = k->next2;
+							m = k->next2;
+						}
+						k->next2 = newnode;
+						newnode->next2 = m;
+					}
+				}
+			}
+		}
+		break;
+	case 2:
+		break;
+	}
+}
+
+void save(list* headlist, client* headclient, book* headbook){
+	FILE* fp = fopen("a.txt", "a");
+	list* s = headlist;
+	client* k = headclient;
+	book* p = headbook;
+	char buf[2000] = { NULL };
+	if (fp == NULL){
+		printf("오류\n");
+	}
+	for (s = headlist->next2; s != NULL; s = s->next2){
+		for (k = headclient->next1; k != NULL; k = k->next1){
+			if (strcmp(s->number1, k->number) == 0){
+				for (p = headbook->next; p != NULL; p = p->next){
+					if (strcmp(s->number2, p->chNumber) == 0){
+						fprintf(fp, "%s,%s,%s,%s,%s,%s,%s,%s*", p->chNumber,p->chName,p->chAuthor,k->number,k->name,k->phone,s->rent,s->turn);
+					}
+					break;
+				}
+			}
+		}
+	}
+	fclose(fp);
+}
+
+void turn(client* headclient, book* headbook, list* headlist){
+	char data[10];
+	char data1[10];
+	int count = 0, count1 = 0;
+	book* p;
+	list* k;
+	client* s;
+	printf("도서번호 : ");
+	scanf("%s", data);
+	for (p = headbook->next; p != NULL; p = p->next){
+		if (strcmp(p->chNumber, data) == 0){
+			count1++;
+			printf("고객번호 : ");
+			scanf("%s", data1);
+			for (s = headclient->next1; s != NULL; s = s->next1){
+				if (strcmp(s->number, data1) == 0){
+					count++;
+					for (k = headlist->next2; k != NULL; k = k->next2){
+						if (strcmp(s->number, k->number1) == 0){
+							printf("반납일 : ");
+							scanf("%s", k->turn);
+						}
+					}
+				}
+			}
+		}
+	}
+	if (count1 == 0)printf("잘못된 도서번호가 없습니다.\n");
+	else if (count == 0)printf("반납할 도서가 없습니다.\n");
+}
+
+void sortday(client* headclient, book* headbook, list* headlist){
+	book* p;
+	client* s;
+	list* k;
+	printf("대여도서목록\n");
+	printf("도서번호  도서명   저자명  대여고객번호  고객명  전화번호       대여일    반납일\n");
+	for (k = headlist->next2; k != NULL; k = k->next2){
+		for (s = headclient->next1; s != NULL; s = s->next1){
+			if (strcmp(k->number1, s->number) == 0){
+				for (p = headbook->next; p != NULL; p = p->next){
+					if (strcmp(k->number2, p->chNumber) == 0){
+						printf("%4s     %5s       %3s     %4s     %3s      %13s       %10s %s\n", p->chNumber, p->chName, p->chAuthor, s->number, s->name, s->phone, k->rent, k->turn);
+					}
+				}
+			}
+		}
+	}
+}
+
+void searchbook(client* headclient, book* headbook, list* headlist){
+	char data[10];
+	book* p;
+	client* s;
+	list* k;
+	int count = 0;
+	printf("도서번호 : ");
+	scanf("%s", data);
+	for (p = headbook->next; p != NULL; p = p->next){
+		if (strcmp(p->chNumber, data) == 0){
+			printf("도서명 : %s  저자 : %s\n출판사 : %s  출판일 : %s\n", p->chName, p->chAuthor, p->chPublisher, p->chDay);
+		}
+	}
+	printf("대여기록\n");
+	printf("이름    전화번호     이메일       대여일      반납일\n");
+	for (p = headbook->next; p != NULL; p = p->next){
+		if (strcmp(p->chNumber, data) == 0){
+			for (k = headlist->next2; k != NULL; k = k->next2){
+				if (strcmp(p->chNumber, k->number2) == 0){
+					for (s = headclient->next1; s != NULL; s = s->next1){
+						if (strcmp(k->number1, s->number) == 0){
+							printf("%3s    %13s       %15s     %10s       %s\n", s->name, s->phone, s->email, k->rent, k->turn);
+							count++;
+						}
+					}
+				}
+			}
+		}
+	}
+	if (count == 0)printf("일치하는 정보가 없습니다.");
+}
+
+void searchclient(client* headclient, book* headbook, list* headlist){
+	char data[10];
+	int count = 0;
+	book* p;
+	client* s;
+	list* k;
+	printf("고객번호 : ");
+	scanf("%s", data);
+	for (s = headclient->next1; s != NULL; s = s->next1){
+		if (strcmp(s->number, data) == 0){
+			printf("고객명 : %s 전화번호 : %s\n이메일 : %s\n", s->name, s->phone, s->email);
+		}
+	}
+	printf("대여기록\n");
+	printf("도서명   저자명     출판사          출판일              대여일     반납일\n");
+	for (s = headclient->next1; s != NULL; s = s->next1){
+		if (strcmp(s->number, data) == 0){
+			for (k = headlist->next2; k != NULL; k = k->next2){
+				if (strcmp(s->number, k->number1) == 0){
+					for (p = headbook->next; p != NULL; p = p->next){
+						if (strcmp(k->number2, p->chNumber) == 0){
+							printf("%4s     %3s     %4s     %4s          %13s     %s\n", p->chName, p->chAuthor, p->chPublisher, p->chDay, k->rent, k->turn);
+							count++;
+						}
+					}
+				}
+			}
+		}
+	}
+	if (count == 0)printf("일치하는 정보가 없습니다.");
+}
+
+void delay(client* headclient, book* headbook, list* headlist){
+	char data[10];
+	client* s;
+	book* p;
+	list* k;
+	strcpy(data, "미반납");
+	printf("도서번호  도서명   저자명  대여고객번호  고객명  전화번호     대여일    반납일\n");
+	for (k = headlist->next2; k != NULL; k = k->next2){
+		if (strcmp(k->turn, data) == 0){
+			for (s = headclient->next1; s != NULL; s = s->next1){
+				if (strcmp(k->number1, s->number) == 0){
+					for (p = headbook->next; p != NULL; p = p->next){
+						if (strcmp(k->number2, p->chNumber) == 0){
+							printf("%4s     %5s       %3s     %4s     %3s  %13s       %10s %s\n", p->chNumber, p->chName, p->chAuthor, s->number, s->name, s->phone, k->rent, k->turn);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void importprint(client* headclient, book* headbook, list* headlist){
+	int i, add = 0;
+	char buf[20000] = { NULL };
+	client* s = headclient;
+	client* newclient = (client*)malloc(sizeof(client));
+	book* p = headbook;
+	book* newbook = (book*)malloc(sizeof(book));
+	list* k = headlist;
+	list* newlist = (list*)malloc(sizeof(list));
+	newclient->next1 = NULL;
+	newbook->next = NULL;
+	newlist->next2 = NULL;
+	FILE *fp = fopen("a.txt", "r");
+	fseek(fp, 0, SEEK_END);
+	long iSize = ftell(fp);
+	rewind(fp);
+	char *buffer;
+	buffer = (char*)malloc(sizeof(char)*iSize);
+	fread(buffer, 1, iSize, fp);
+	for (i = 0; i < iSize; i++){
+		buf[i] = buffer[i];
+	}
+	int count = 0,len=0;
+	char *ptr, *ptr1;
+	char *data[1000] = { NULL, };
+	char*data1[10] = { NULL };
+	char h[50] = { NULL };
+	char a = { ","};
+	i = 0;
+	int j = 0;
+	ptr = strtok(buf, "*");
+	while (ptr != NULL){
+		//printf("%s\n", ptr);
+		data[i] = ptr;
+		i++;
+		ptr = strtok(NULL, "*");
+	}
+	for (i = 0; i < 1000; i++){
+		if (data[i] != NULL){
+			len = strlen(data[i]);
+			for (int j = 0; j < len; j++){
+				h[j] = *(data[i]+j);
+			}
+			count = count1(h);
+			if (count == 3){
+				ptr1 = strtok(data[i], ",");
+				while (ptr1 != NULL){
+					data1[j] = ptr1;
+					j++;
+					ptr1 = strtok(NULL, ",");
+				}
+				strcpy(newclient->number, data1[0]);
+				strcpy(newclient->name, data1[1]);
+				strcpy(newclient->phone, data1[2]);
+				strcpy(newclient->email, data1[3]);
+				if (headclient == NULL){
+					headclient->next1 = s;
+				}
+				else{
+					while (s->next1 != NULL){
+						s = s->next1;
+					}
+					s->next1 = newclient;
+				}
+			}
+			else if (count == 4){
+				ptr1 = strtok(data[i], ",");
+				while (ptr1 != NULL){
+					data1[j] = ptr1;
+					j++;
+					ptr1 = strtok(NULL, ",");
+				}
+				strcpy(newbook->chName, data1[0]);
+				strcpy(newbook->chAuthor, data1[1]);
+				strcpy(newbook->chNumber, data1[2]);
+				strcpy(newbook->chPublisher, data1[3]);
+				strcpy(newbook->chDay, data1[4]);
+				if (headbook == NULL){
+					headbook->next = p;
+				}
+				else{
+					while (p->next != NULL){
+						p = p->next;
+					}
+					p->next = newbook;
+				}
+			}
+			if (count == 7){
+				ptr1 = strtok(data[i], ",");
+				while (ptr1 != NULL){
+					data1[j] = ptr1;
+					j++;
+					ptr1 = strtok(NULL, ",");
+				}
+				strcpy(newlist->number2, data1[0]);
+				strcpy(newlist->number1, data1[3]);
+				strcpy(newlist->rent, data1[6]);
+				strcpy(newlist->turn, data1[7]);
+				if (headlist == NULL){
+					headlist->next2 = k;
+				}
+				else{
+					while (k->next2 != NULL){
+						k = k->next2;
+					}
+					k->next2 = newlist;
+				}
+			}
+		}
+		count = j = 0;
+	}
+	fclose(fp);
+}
+
+int count1(char* h){
+	int i, count=0;
+	for (i = 0; h[i] != NULL; i++){
+		if (h[i] == ',')count++;
+		else{
+			continue;
+		}
+	}
+	return count;
+}
+
+void main(){
+	int a = 1, b = 1;
+	book* headbook = (book*)malloc(sizeof(book));
+	client* headclient = (client*)malloc(sizeof(client));
+	list* headlist = (list*)malloc(sizeof(list));
+	headlist->next2 = NULL;
+	headclient->next1 = NULL;
+	headbook->next = NULL;
+	while (a != 0){
+		menu();
+		scanf("%d", &a);
+		if (a == 1){
+			while (b != 0){
+				menu1();
+				scanf("%d", &b);
+				if (b == 1)insertclient(headclient);
+				else if (b == 2)modifyclient(headclient);
+				else if (b == 3)deleteclient(headclient);
+				else if (b == 4)searchnameclient(headclient);
+				else if (b == 5)searchphoneclient(headclient);
+				else if (b == 6){
+					sortclient(headclient);
+					printclient(headclient);
+				}
+			}
+			b = 1;
+		}
+		else if (a == 2){
+			while (b != 0){
+				menu2();
+				scanf("%d", &b);
+				if (b == 1)insertbook(headbook);
+				else if (b == 2)modifybook(headbook);
+				else if (b == 3)deletebook(headbook);
+				else if (b == 4)searchnamebook(headbook);
+				else if (b == 5)searchdaybook(headbook);
+				else if (b == 6){
+					sortnamebook(headbook);
+					printbook(headbook);
+				}
+				else if (b == 7){
+					sortauthorbook(headbook);
+					printbook(headbook);
+				}
+				else if (b == 8){
+					sortdaybook(headbook);
+					printbook(headbook);
+				}
+			}
+			b = 1;
+		}
+		else if (a == 3){
+			while (b != 0){
+				menu3();
+				scanf("%d", &b);
+				if (b == 1)rent(headclient, headbook, headlist);
+				else if (b == 2)turn(headclient, headbook, headlist);
+				else if (b == 3)sortday(headclient, headbook, headlist);
+				else if (b == 4)searchbook(headclient, headbook, headlist);
+				else if (b == 5)searchclient(headclient, headbook, headlist);
+				else if (b == 6)delay(headclient, headbook, headlist);
+			}
+			b = 1;
+		}
+		else if (a == 4){
+			saveclient(headclient);
+			savebook(headbook);
+			save(headlist, headclient, headbook);
+		}
+		else if (a == 5){
+			importprint(headclient, headbook, headlist);
+		}
+	}
+}
